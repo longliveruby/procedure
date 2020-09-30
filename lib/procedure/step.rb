@@ -7,7 +7,7 @@ module Procedure
 
     module ClassMethods
       def passed?(context = {})
-        fake_open_struct = Struct.new(*params.keys).new(*params.values)
+        fake_open_struct = Struct.new(*context.keys).new(*context.values)
 
         new(fake_open_struct).passed?
       end

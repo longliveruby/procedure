@@ -6,7 +6,7 @@ module Procedure
     #
     # @return [String]
     def to_s
-      "0.0.3"
+      "0.0.4"
     end
   end
 end
