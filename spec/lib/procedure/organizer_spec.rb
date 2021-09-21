@@ -39,6 +39,22 @@ RSpec.describe Procedure::Organizer do
     end
   end
 
+  class FakeFailedStepTwo
+    include Procedure::Step
+
+    def passed?
+      false
+    end
+
+    def failure_message
+      "User #{context.first_name} is too long"
+    end
+
+    def failure_code
+      :user_first_name_too_long
+    end
+  end
+
   class FakePassedOrganizer
     include Procedure::Organizer
 
@@ -48,19 +64,31 @@ RSpec.describe Procedure::Organizer do
   class FakeFailedOrganizer
     include Procedure::Organizer
 
-    steps FakePassedStepOne, FakeFailedStepOne, FakePassedStepTwo
+    steps FakePassedStepOne, FakeFailedStepOne, FakePassedStepTwo, FakeFailedStepTwo
   end
 
-  it 'returns false outcome when procedure did not passed' do
-    outcome = FakeFailedOrganizer.call(context)
+  context 'when fail_fast option is passed' do
+    it 'returns false outcome when procedure did not passed' do
+      outcome = FakeFailedOrganizer.call(context: context)
 
-    expect(outcome).not_to be_success
-    expect(outcome.failure_message).to eq('User John is not valid')
-    expect(outcome.failure_code).to eq(:user_not_valid)
+      expect(outcome).not_to be_success
+      expect(outcome.failure_messages).to eq(['User John is not valid'])
+      expect(outcome.failure_codes).to eq([:user_not_valid])
+    end
+  end
+
+  context 'when fail_fast option is not passed' do
+    it 'returns false outcome when procedure did not passed' do
+      outcome = FakeFailedOrganizer.call(context: context, options: { fail_fast: false })
+
+      expect(outcome).not_to be_success
+      expect(outcome.failure_messages).to eq(['User John is not valid', 'User John is too long'])
+      expect(outcome.failure_codes).to eq([:user_not_valid, :user_first_name_too_long])
+    end
   end
 
   it 'returns true outcome when procedure passed' do
-    outcome = FakePassedOrganizer.call(context)
+    outcome = FakePassedOrganizer.call(context: context)
 
     expect(outcome).to be_success
   end

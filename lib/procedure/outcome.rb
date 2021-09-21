@@ -2,7 +2,7 @@ module Procedure
   class Outcome
     def initialize(step_classes)
       @step_classes = step_classes
-      @failed_step = nil
+      @failed_steps = []
       @passed_steps = []
     end
 
@@ -10,28 +10,28 @@ module Procedure
       if step.passed?
         @passed_steps << step
       else
-        @failed_step = step
+        @failed_steps << step
       end
     end
 
-    def failure_message
-      return unless failure?
+    def failure_messages
+      return [] unless failure?
 
-      @failed_step.failure_message
+      @failed_steps.map(&:failure_message)
     end
 
-    def failure_code
-      return unless failure?
+    def failure_codes
+      return [] unless failure?
 
-      @failed_step.failure_code
+      @failed_steps.map(&:failure_code)
     end
 
     def failure?
-      !@failed_step.nil?
+      @failed_steps.size.positive?
     end
 
     def positive?
-      @failed_step.nil? && @step_classes.size == @passed_steps.size
+      @failed_steps.size.zero? && @step_classes.size == @passed_steps.size
     end
 
     def passed_steps

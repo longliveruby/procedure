@@ -12,12 +12,13 @@ module Procedure
         @step_classes = step_classes
       end
 
-      def call(context = {})
+      def call(context: {}, options: {})
+        base_options = { fail_fast: true }.merge(options)
         params = { execution_time: Time.now }.merge(context)
         fake_open_struct = Struct.new(*params.keys).new(*params.values)
 
         Procedure::Process.new(fake_open_struct, @step_classes).tap do |process|
-          process.call
+          process.call(base_options[:fail_fast])
         end
       end
     end

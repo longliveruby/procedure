@@ -2,6 +2,7 @@ require File.expand_path('../lib/procedure/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 3.7', '>= 3.7.0'
+  s.add_development_dependency 'pry'
   s.name        = 'procedure'
   s.version     = ::Procedure::Version
   s.date        = '2019-11-21'

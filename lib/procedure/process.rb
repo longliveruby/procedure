@@ -14,24 +14,24 @@ module Procedure
       !success?
     end
 
-    def failure_message
-      outcome.failure_message
+    def failure_messages
+      outcome.failure_messages
     end
 
-    def failure_code
-      outcome.failure_code
+    def failure_codes
+      outcome.failure_codes
     end
 
     def passed_steps
       outcome.passed_steps
     end
 
-    def call
+    def call(fail_fast)
       @steps.each do |step_class|
         step = step_class.new(@context)
         outcome.add(step)
 
-        break if outcome.failure?
+        break if outcome.failure? && fail_fast
       end
     end
 
