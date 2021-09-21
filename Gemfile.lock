@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    procedure (0.0.2)
+    procedure (0.0.4)
 
 GEM
   specs:
