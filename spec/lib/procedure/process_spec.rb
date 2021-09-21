@@ -36,7 +36,7 @@ RSpec.describe Procedure::Process do
       let(:steps) { [FakeStepOne, FakeStepTwo] }
 
       it 'returns all steps' do
-        subject.call
+        subject.call(false)
 
         expect(subject.passed_steps).to eq(["FakeStepOne", "FakeStepTwo"])
       end
@@ -45,10 +45,16 @@ RSpec.describe Procedure::Process do
     context 'when one of the steps failed' do
       let(:steps) { [FakeStepOne, FakeStepThree, FakeStepTwo] }
 
-      it 'returns only passed steps' do
-        subject.call
+      it 'returns only passed steps if fail_fast option is true' do
+        subject.call(true)
 
         expect(subject.passed_steps).to eq(["FakeStepOne"])
+      end
+
+      it 'returns all passed steps if fail_fast option is false' do
+        subject.call(false)
+
+        expect(subject.passed_steps).to eq(["FakeStepOne", "FakeStepTwo"])
       end
     end
   end
@@ -57,10 +63,16 @@ RSpec.describe Procedure::Process do
     context 'when one of steps failed' do
       let(:steps) { [FakeStepOne, FakeStepThree, FakeStepTwo] }
 
-      it 'does not call steps after failure' do
+      it 'does not call steps after failure if fail_fast option is true' do
         expect(FakeStepTwo).not_to receive(:new)
 
-        subject.call
+        subject.call(true)
+      end
+
+      it 'calls steps after failure if fail_fast option is false' do
+        expect(FakeStepTwo).to receive(:new).and_call_original
+
+        subject.call(false)
       end
     end
 
@@ -71,7 +83,7 @@ RSpec.describe Procedure::Process do
         expect(FakeStepOne).to receive(:new).and_call_original
         expect(FakeStepTwo).to receive(:new).and_call_original
 
-        subject.call
+        subject.call(true)
       end
     end
   end
@@ -81,7 +93,7 @@ RSpec.describe Procedure::Process do
       let(:steps) { [FakeStepOne, FakeStepTwo] }
 
       it 'returns true' do
-        subject.call
+        subject.call(true)
 
         expect(subject).to be_success
       end
@@ -91,7 +103,7 @@ RSpec.describe Procedure::Process do
       let(:steps) { [FakeStepOne, FakeStepThree] }
 
       it 'returns false' do
-        subject.call
+        subject.call(true)
 
         expect(subject).not_to be_success
       end
